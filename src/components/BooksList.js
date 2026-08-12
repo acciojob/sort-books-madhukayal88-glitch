@@ -1,60 +1,59 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooks, setSortBy, setSortOrder } from '../redux/actions';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchBooks, setSortBy, setSortOrder } from '../features/booksSlice';
 
 const BooksList = () => {
   const dispatch = useDispatch();
-  const { books, loading, error, sortBy, sortOrder } = useSelector(
-    (state) => state
-  );
+  const { booksList, sortBy, sortOrder, loading, error } = useSelector((state) => state.books);
 
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  // Sorting Logic
-  const sortedBooks = [...books].sort((a, b) => {
-    const key = sortBy.toLowerCase();
-    const valA = (a[key] || '').toString().toLowerCase();
-    const valB = (b[key] || '').toString().toLowerCase();
+  const handleSortByChange = (e) => {
+    dispatch(setSortBy(e.target.value));
+  };
 
-    if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-    if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+  const handleSortOrderChange = (e) => {
+    dispatch(setSortOrder(e.target.value));
+  };
+
+  // Sorting logic based on selected criterion and order
+  const sortedBooks = [...booksList].sort((a, b) => {
+    const fieldA = (a[sortBy] || '').toString().toLowerCase();
+    const fieldB = (b[sortBy] || '').toString().toLowerCase();
+
+    if (fieldA < fieldB) return sortOrder === 'asc' ? -1 : 1;
+    if (fieldA > fieldB) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
 
   return (
-    <div className="container" style={{ padding: '20px' }}>
-      <h1>Book Sorting App</h1>
+    <div className="container">
+      <h2>Book Sorting Application</h2>
 
-      {/* Control Panel: Select dropdowns matching Cypress selectors */}
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      {/* Control Panel targeting Cypress nth-child selectors */}
+      <div className="controls">
         {/* select:nth-child(1) */}
-        <select
-          value={sortBy}
-          onChange={(e) => dispatch(setSortBy(e.target.value))}
-        >
+        <select value={sortBy} onChange={handleSortByChange}>
           <option value="title">Title</option>
           <option value="author">Author</option>
           <option value="publisher">Publisher</option>
         </select>
 
         {/* select:nth-child(2) */}
-        <select
-          value={sortOrder}
-          onChange={(e) => dispatch(setSortOrder(e.target.value))}
-        >
+        <select value={sortOrder} onChange={handleSortOrderChange}>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
         </select>
       </div>
 
-      {loading && <p>Loading books...</p>}
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+      {loading && <p className="loading">Loading books...</p>}
+      {error && <p className="error">{error}</p>}
 
       {/* Books Table */}
       {!loading && !error && (
-        <table border="1" cellPadding="8" cellSpacing="0" style={{ width: '100%' }}>
+        <table>
           <thead>
             <tr>
               <th>Title</th>
