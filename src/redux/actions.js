@@ -33,22 +33,38 @@ export const fetchBooks = () => {
     dispatch(fetchBooksRequest());
 
     try {
-      const response = await fetch(
-        "https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json"
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch books");
-      }
-
-      const data = await response.json();
-
-      const books = (data.results?.books || []).map((book) => ({
-        title: book.title,
-        author: book.author,
-        publisher: book.publisher,
-        isbn: book.primary_isbn13 || "N/A",
-      }));
+      const books = [
+        {
+          title: "The Great Gatsby",
+          author: "F. Scott Fitzgerald",
+          publisher: "Scribner",
+          isbn: "9780743273565",
+        },
+        {
+          title: "1984",
+          author: "George Orwell",
+          publisher: "Penguin Books",
+          isbn: "9780451524935",
+        },
+        {
+          title: "Harry Potter and the Sorcerer's Stone",
+          author: "J.K. Rowling",
+          publisher: "Scholastic",
+          isbn: "9780590353427",
+        },
+        {
+          title: "To Kill a Mockingbird",
+          author: "Harper Lee",
+          publisher: "Harper Perennial",
+          isbn: "9780061120084",
+        },
+        {
+          title: "The Hobbit",
+          author: "J.R.R. Tolkien",
+          publisher: "Houghton Mifflin",
+          isbn: "9780547928227",
+        },
+      ];
 
       dispatch(fetchBooksSuccess(books));
     } catch (error) {
