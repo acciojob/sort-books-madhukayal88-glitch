@@ -1,8 +1,8 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import store from './store/store';
+import store from './redux/store';
 import BooksList from './components/BooksList';
-import './App.css';
+import './index.css';
 
 function App() {
   return (
