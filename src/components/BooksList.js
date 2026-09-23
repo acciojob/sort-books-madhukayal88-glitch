@@ -1,81 +1,80 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchBooks, setSortBy, setSortOrder } from '../redux/actions';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchBooks,
+  setSortBy,
+  setSortOrder,
+} from "../features/books/booksSlice";
+import {
+  selectSortedBooks,
+  selectSortBy,
+  selectSortOrder,
+  selectLoading,
+  selectError,
+} from "../features/books/booksSelectors";
+import "./BooksList.css";
 
-const BooksList = () => {
+function BooksList() {
   const dispatch = useDispatch();
-  const { books, loading, error, sortBy, sortOrder } = useSelector(
-    (state) => state.books
-  );
+
+  const books = useSelector(selectSortedBooks);
+  const sortBy = useSelector(selectSortBy);
+  const sortOrder = useSelector(selectSortOrder);
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
 
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  const sortedBooks = [...books].sort((a, b) => {
-    const valA = (a[sortBy] || '').toString().toLowerCase();
-    const valB = (b[sortBy] || '').toString().toLowerCase();
-    if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-    if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-    return 0;
-  });
-
   return (
-    <div className="books-container">
-      <h1>Book Sorting App</h1>
+    <div className="books-list">
+      <div className="sort-controls">
+        <select
+          aria-label="Sort By"
+          value={sortBy}
+          onChange={(e) => dispatch(setSortBy(e.target.value))}
+        >
+          <option value="title">Title</option>
+          <option value="author">Author</option>
+          <option value="publisher">Publisher</option>
+        </select>
 
-      <div className="controls">
-        <label>
-          Sort By:{' '}
-          <select
-            value={sortBy}
-            onChange={(e) => dispatch(setSortBy(e.target.value))}
-          >
-            <option value="title">Title</option>
-            <option value="author">Author</option>
-            <option value="publisher">Publisher</option>
-          </select>
-        </label>
-
-        <label>
-          Order:{' '}
-          <select
-            value={sortOrder}
-            onChange={(e) => dispatch(setSortOrder(e.target.value))}
-          >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
-        </label>
+        <select
+          aria-label="Order"
+          value={sortOrder}
+          onChange={(e) => dispatch(setSortOrder(e.target.value))}
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
       </div>
 
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
+      {loading && <p>Loading books...</p>}
+      {error && <p role="alert">Error: {error}</p>}
 
-      {!loading && !error && (
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Publisher</th>
-              <th>ISBN</th>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publisher</th>
+            <th>ISBN</th>
+          </tr>
+        </thead>
+        <tbody>
+          {books.map((book) => (
+            <tr key={book.id}>
+              <td data-label="Title">{book.title}</td>
+              <td data-label="Author">{book.author}</td>
+              <td data-label="Publisher">{book.publisher}</td>
+              <td data-label="ISBN">{book.isbn}</td>
             </tr>
-          </thead>
-          <tbody>
-            {sortedBooks.map((book, index) => (
-              <tr key={index}>
-                <td>{book.title}</td>
-                <td>{book.author}</td>
-                <td>{book.publisher}</td>
-                <td>{book.isbn}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-};
+}
 
 export default BooksList;
